@@ -140,11 +140,11 @@ if (!window._docPreviewClickAttached) {
                 const response = await fetch(`/docx/preview/${attachmentId}`);
                 const pdfData = await response.arrayBuffer();
 
-                const pdfModule = await import("/ts_office_files_preview/static/lib/pdf.mjs");
+                const pdfModule = await import("/ts_preview_office_files/static/lib/pdf.mjs");
                 const pdfjsLib = pdfModule;
 
                 pdfjsLib.GlobalWorkerOptions.workerSrc =
-                    "/ts_office_files_preview/static/lib/pdf.worker.mjs";
+                    "/ts_preview_office_files/static/lib/pdf.worker.mjs";
 
                 const pdf = await pdfjsLib.getDocument({data: pdfData}).promise;
 
@@ -194,11 +194,11 @@ if (!window._docPreviewClickAttached) {
                 const response = await fetch(`/ppt/preview/${attachmentId}`);
                 const pdfData = await response.arrayBuffer();
 
-                const pdfModule = await import("/ts_office_files_preview/static/lib/pdf.mjs");
+                const pdfModule = await import("/ts_preview_office_files/static/lib/pdf.mjs");
                 const pdfjsLib = pdfModule;
 
                 pdfjsLib.GlobalWorkerOptions.workerSrc =
-                    "/ts_office_files_preview/static/lib/pdf.worker.mjs";
+                    "/ts_preview_office_files/static/lib/pdf.worker.mjs";
 
                 const pdf = await pdfjsLib.getDocument({data: pdfData}).promise;
 
