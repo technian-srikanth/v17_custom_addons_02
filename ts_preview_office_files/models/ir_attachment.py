@@ -7,6 +7,7 @@ import subprocess
 import os
 import platform
 import shutil
+import psutil
 
 
 # =====================================================
@@ -31,6 +32,92 @@ if not os.path.exists(LIBREOFFICE_PATH):
     raise Exception(
         f"LibreOffice not found: {LIBREOFFICE_PATH}"
     )
+
+
+# =====================================================
+# GLOBAL PROFILE
+# =====================================================
+LIBREOFFICE_PROFILE = os.path.join(
+
+    tempfile.gettempdir(),
+
+    "odoo_lo_profile"
+)
+
+os.makedirs(
+    LIBREOFFICE_PROFILE,
+    exist_ok=True
+)
+
+
+# =====================================================
+# CHECK RUNNING
+# =====================================================
+def is_libreoffice_running():
+
+    for proc in psutil.process_iter(['name']):
+
+        try:
+
+            process_name = (
+                proc.info['name'] or ''
+            ).lower()
+
+            if (
+                'soffice' in process_name
+                or 'soffice.bin' in process_name
+            ):
+
+                return True
+
+        except Exception:
+            pass
+
+    return False
+
+
+# =====================================================
+# START BACKGROUND PROCESS
+# =====================================================
+def start_libreoffice():
+
+    if is_libreoffice_running():
+
+        return
+
+    try:
+
+        subprocess.Popen([
+
+            LIBREOFFICE_PATH,
+
+            f'-env:UserInstallation=file:///{LIBREOFFICE_PROFILE.replace(os.sep, "/")}',
+
+            '--headless',
+
+            '--nologo',
+
+            '--nodefault',
+
+            '--nofirststartwizard',
+
+            '--norestore',
+
+            '--invisible',
+
+        ])
+
+    except Exception as e:
+
+        print(
+            f"LibreOffice startup failed: {e}"
+        )
+
+
+# =====================================================
+# AUTO START
+# =====================================================
+start_libreoffice()
 
 
 class IrAttachment(models.Model):
@@ -96,9 +183,6 @@ class IrAttachment(models.Model):
 
         try:
 
-            # =====================================================
-            # ALREADY GENERATED
-            # =====================================================
             if self.preview_generated:
                 return
 
@@ -113,14 +197,8 @@ class IrAttachment(models.Model):
                 else 'pptx'
             )
 
-            # =====================================================
-            # CONVERT
-            # =====================================================
             self._convert_to_pdf_with_cache(ext)
 
-            # =====================================================
-            # SUCCESS
-            # =====================================================
             self.write({
 
                 'preview_generated': True,
@@ -130,9 +208,6 @@ class IrAttachment(models.Model):
 
         except Exception as e:
 
-            # =====================================================
-            # ERROR
-            # =====================================================
             self.write({
 
                 'preview_error': str(e)
@@ -202,16 +277,6 @@ class IrAttachment(models.Model):
         with tempfile.TemporaryDirectory() as tmpdir:
 
             # =====================================================
-            # UNIQUE LIBREOFFICE PROFILE
-            # =====================================================
-            profile_dir = os.path.join(
-                tmpdir,
-                "lo_profile"
-            )
-
-            os.makedirs(profile_dir, exist_ok=True)
-
-            # =====================================================
             # INPUT FILE
             # =====================================================
             input_path = os.path.join(
@@ -232,13 +297,18 @@ class IrAttachment(models.Model):
                 )
 
             # =====================================================
-            # LIBREOFFICE CONVERSION
+            # START LO IF NOT RUNNING
+            # =====================================================
+            start_libreoffice()
+
+            # =====================================================
+            # CONVERT
             # =====================================================
             process = subprocess.run(
                 [
                     LIBREOFFICE_PATH,
 
-                    f'-env:UserInstallation=file:///{profile_dir.replace(os.sep, "/")}',
+                    f'-env:UserInstallation=file:///{LIBREOFFICE_PROFILE.replace(os.sep, "/")}',
 
                     '--headless',
 
@@ -251,8 +321,6 @@ class IrAttachment(models.Model):
                     '--nodefault',
 
                     '--invisible',
-
-                    '--quickstart=no',
 
                     '--convert-to',
                     'pdf',
@@ -273,7 +341,7 @@ class IrAttachment(models.Model):
             )
 
             # =====================================================
-            # CONVERSION ERROR
+            # ERROR
             # =====================================================
             if process.returncode != 0:
 
@@ -284,7 +352,7 @@ class IrAttachment(models.Model):
                 )
 
             # =====================================================
-            # PDF PATH
+            # PDF FILE
             # =====================================================
             pdf_path = os.path.join(
 

@@ -23,6 +23,13 @@ else:
     )
 
 
+if not os.path.exists(LIBREOFFICE_PATH):
+
+    raise Exception(
+        f"LibreOffice not found: {LIBREOFFICE_PATH}"
+    )
+
+
 # =====================================================
 # GLOBAL PROFILE
 # =====================================================
@@ -40,11 +47,11 @@ os.makedirs(
 
 
 # =====================================================
-# CHECK IF RUNNING
+# CHECK RUNNING
 # =====================================================
 def is_libreoffice_running():
 
-    for proc in psutil.process_iter(['name']):
+    for proc in psutil.process_iter(['name', 'cmdline']):
 
         try:
 
@@ -52,12 +59,19 @@ def is_libreoffice_running():
                 proc.info['name'] or ''
             ).lower()
 
+            cmdline = " ".join(
+                proc.info.get('cmdline') or []
+            ).lower()
+
             if (
                 'soffice' in process_name
                 or 'soffice.bin' in process_name
             ):
 
-                return True
+                # ensure same profile
+                if LIBREOFFICE_PROFILE.lower() in cmdline:
+
+                    return True
 
         except Exception:
             pass
@@ -66,7 +80,7 @@ def is_libreoffice_running():
 
 
 # =====================================================
-# START LIBREOFFICE BACKGROUND PROCESS
+# START BACKGROUND PROCESS
 # =====================================================
 def start_libreoffice():
 
@@ -80,25 +94,32 @@ def start_libreoffice():
 
     try:
 
-        subprocess.Popen([
+        subprocess.Popen(
 
-            LIBREOFFICE_PATH,
+            [
+                LIBREOFFICE_PATH,
 
-            f'-env:UserInstallation=file:///{LIBREOFFICE_PROFILE.replace(os.sep, "/")}',
+                f'-env:UserInstallation=file:///{LIBREOFFICE_PROFILE.replace(os.sep, "/")}',
 
-            '--headless',
+                '--headless',
 
-            '--nologo',
+                '--nologo',
 
-            '--nodefault',
+                '--nodefault',
 
-            '--nofirststartwizard',
+                '--nofirststartwizard',
 
-            '--norestore',
+                '--norestore',
 
-            '--invisible',
+                '--nolockcheck',
 
-        ])
+                '--invisible',
+            ],
+
+            creationflags=subprocess.CREATE_NO_WINDOW
+            if platform.system() == "Windows"
+            else 0
+        )
 
         print(
             "LibreOffice background process started"
@@ -109,7 +130,6 @@ def start_libreoffice():
         print(
             f"LibreOffice startup failed: {e}"
         )
-
 
 # =====================================================
 # AUTO START

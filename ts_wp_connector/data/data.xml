@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+
+    <record id="param_wp_username" model="ir.config_parameter">
+        <field name="key">wp_username</field>
+        <field name="value">anjli.sharma@technians.com</field>
+    </record>
+
+    <record id="param_wp_password" model="ir.config_parameter">
+        <field name="key">wp_password</field>
+        <field name="value">BN2qSiLwQqgKPbsc8nYdOIiZ</field>
+    </record>
+
+    <record id="param_wp_job_api" model="ir.config_parameter">
+        <field name="key">wp_job_api</field>
+        <field name="value">https://staging-9a67-technianscom.wpcomstaging.com/wp-json/wp/v2/job</field>
+    </record>
+
+    <record id="param_wp_location_api" model="ir.config_parameter">
+        <field name="key">wp_worklocation_api</field>
+        <field name="value">https://staging-9a67-technianscom.wpcomstaging.com/wp-json/wp/v2/job-location</field>
+    </record>
+
+    <record id="param_wp_department_api" model="ir.config_parameter">
+        <field name="key">wp_department_api</field>
+        <field name="value">https://staging-9a67-technianscom.wpcomstaging.com/wp-json/wp/v2/job-type</field>
+    </record>
+
+</odoo>

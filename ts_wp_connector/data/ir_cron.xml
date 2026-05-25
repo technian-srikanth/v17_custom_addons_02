@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="ir_cron_pulbish_jobto_wordpress" model="ir.cron">
+            <field name="name">Publish Job to WordPress</field>
+            <field name="model_id" ref="hr.model_hr_job"/>
+            <field name="state">code</field>
+            <field name="code">
+                model.cron_publish_jobs_to_wp()
+            </field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <field name="active">True</field>
+        </record>
+
+
+        <record id="ir_cron_pulbish_departmentto_wordpress" model="ir.cron">
+            <field name="name">Publish Department to WordPress</field>
+            <field name="model_id" ref="hr.model_hr_department"/>
+            <field name="state">code</field>
+            <field name="code">
+                model.cron_publish_department_to_wp()
+            </field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <field name="active">True</field>
+        </record>
+
+
+        <record id="ir_cron_pulbish_worklocationto_wordpress" model="ir.cron">
+            <field name="name">Publish Work Location to WordPress</field>
+            <field name="model_id" ref="hr.model_hr_work_location"/>
+            <field name="state">code</field>
+            <field name="code">
+                model.cron_publish_location_to_wp()
+            </field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo>

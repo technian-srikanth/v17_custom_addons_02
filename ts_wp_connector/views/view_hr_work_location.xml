@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="form_hr_work_location_inherit" model="ir.ui.view">
+        <field name="name">hr.work.location.inherit</field>
+        <field name="model">hr.work.location</field>
+        <field name="inherit_id" ref="hr.hr_work_location_form_view"/>
+        <field name="arch" type="xml">
+             <xpath expr="//form/sheet" position="before">
+                <header>
+                    <button name="action_publish_to_wp"
+                            type="object"
+                            string="Update to wordpress"
+                            class="btn-primary"/>
+                </header>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="wp_location_id"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="tree_hr_work_location_inherit" model="ir.ui.view">
+        <field name="name">hr.work.location.tree.inherit</field>
+        <field name="model">hr.work.location</field>
+        <field name="inherit_id" ref="hr.hr_work_location_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="wp_location_id" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

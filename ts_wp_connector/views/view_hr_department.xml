@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="tree_hr_job_department_inherit" model="ir.ui.view">
+        <field name="name">hr.department.tree.inherit</field>
+        <field name="model">hr.department</field>
+        <field name="inherit_id" ref="hr.view_department_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="wp_department_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="form_hr_job_department_inherit" model="ir.ui.view">
+        <field name="name">hr.department.form.inherit</field>
+        <field name="model">hr.department</field>
+        <field name="inherit_id" ref="hr.view_department_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="wp_department_id"/>
+            </xpath>
+            <xpath expr="//form/sheet" position="before">
+                <header>
+                    <button name="action_publish_to_wp"
+                            type="object"
+                            string="Update to wordpress"
+                            class="btn-primary"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+</odoo>

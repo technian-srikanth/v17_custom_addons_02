@@ -94,7 +94,7 @@ async function waitForPdf(url, loadingEl) {
             loadingEl.style.display = "flex";
 
             await new Promise(
-                r => setTimeout(r, 1000)
+                r => setTimeout(r, 2500)
             );
 
             continue;
