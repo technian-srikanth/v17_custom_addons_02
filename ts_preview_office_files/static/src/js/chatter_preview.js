@@ -3,23 +3,15 @@ import {Dialog} from "@web/core/dialog/dialog";
 import {Component, xml} from "@odoo/owl";
 
 export class DocumentPreview extends Component {
-
     static components = {Dialog};
-
     downloadFile() {
-
         const url =
             `/web/content/${this.props.attachmentId}?download=true`;
-
         const a = document.createElement("a");
-
         a.href = url;
         a.download = this.props.title;
-
         document.body.appendChild(a);
-
         a.click();
-
         document.body.removeChild(a);
     }
 }
@@ -31,88 +23,52 @@ DocumentPreview.template = xml`
     contentClass="'o_full_screen_preview'">
 
 <t t-set-slot="header">
-
     <div class="header">
-
         <h5
             class="mb-0 text-truncate text-white"
             t-esc="props.title"/>
-
         <div class="section-2">
-
             <button
                 class="download-btn btn btn-secondary"
                 t-on-click="downloadFile">
-
                 <i class="fa fa-download"/>
                 Download
-
             </button>
-
             <button
                 class="btn-close"
                 t-on-click="props.close"/>
-
         </div>
-
     </div>
-
 </t>
 
 <div class="o_preview_container d-flex flex-column justify-content-center fixed bottom-0 m-0 p-0">
-
     <div
         id="doc_viewer"
         class="o_doc_viewer flex-grow-1 overflow-auto">
-
         Loading preview...
-
     </div>
-
 </div>
 
 <t t-set-slot="footer">.</t>
-
 </Dialog>
 `;
 
-
-// =====================================================
-// WAIT FOR PDF
-// =====================================================
 async function waitForPdf(url, loadingEl) {
-
     for (let i = 0; i < 30; i++) {
-
         const response = await fetch(url);
-
-        // =====================================================
-        // STILL PROCESSING
-        // =====================================================
         if (response.status === 202) {
-
             loadingEl.style.display = "flex";
-
             await new Promise(
                 r => setTimeout(r, 2500)
             );
-
             continue;
         }
-
-        // =====================================================
-        // SUCCESS
-        // =====================================================
         if (response.ok) {
 
             loadingEl.style.display = "none";
 
             return await response.arrayBuffer();
         }
-
-        // =====================================================
-        // ERROR
-        // =====================================================
         throw new Error(
             `HTTP ${response.status}`
         );
@@ -121,10 +77,6 @@ async function waitForPdf(url, loadingEl) {
     throw new Error("Preview timeout");
 }
 
-
-// =====================================================
-// RENDER PDF
-// =====================================================
 async function renderPdf(
     pdfData,
     container,
@@ -134,89 +86,63 @@ async function renderPdf(
     const pdfModule = await import(
         "/ts_preview_office_files/static/lib/pdf.mjs"
     );
-
     const pdfjsLib = pdfModule;
-
     pdfjsLib.GlobalWorkerOptions.workerSrc =
         "/ts_preview_office_files/static/lib/pdf.worker.mjs";
-
     const pdf =
         await pdfjsLib.getDocument({
             data: pdfData
         }).promise;
-
     for (
         let pageNum = 1;
         pageNum <= pdf.numPages;
         pageNum++
     ) {
-
         const page =
             await pdf.getPage(pageNum);
-
         const viewport =
             page.getViewport({
                 scale: scale
             });
-
         const wrapper =
             document.createElement("div");
-
         wrapper.style.margin = "10px auto";
         wrapper.style.width = "fit-content";
-
         const canvas =
             document.createElement("canvas");
-
         const ctx =
             canvas.getContext("2d");
 
         canvas.height = viewport.height;
         canvas.width = viewport.width;
-
         wrapper.appendChild(canvas);
-
         container.appendChild(wrapper);
-
         await page.render({
-
             canvasContext: ctx,
-
             viewport: viewport
-
         }).promise;
     }
 }
 
 
 if (!window._docPreviewClickAttached) {
-
     window._docPreviewClickAttached = true;
-
     document.addEventListener(
         "click",
         async function (ev) {
-
             const card =
                 ev.target.closest(
                     ".o-mail-AttachmentCard"
                 );
-
             if (!card) return;
-
             const nameEl =
                 card.querySelector(
                     ".text-truncate"
                 );
-
             const filename =
                 nameEl
                     ? nameEl.innerText.trim()
                     : "";
-
-            // =====================================================
-            // SUPPORTED FILES
-            // =====================================================
             if (
                 ![
                     ".csv",
@@ -289,9 +215,6 @@ if (!window._docPreviewClickAttached) {
 
             viewer.replaceChildren();
 
-            // =====================================================
-            // CSV / XLSX
-            // =====================================================
             if (
                 filename.endsWith(".xlsx")
                 || filename.endsWith(".xls")
@@ -374,9 +297,6 @@ if (!window._docPreviewClickAttached) {
                 );
             }
 
-            // =====================================================
-            // DOCX / DOC
-            // =====================================================
             else if (
                 filename.endsWith(".docx")
                 || filename.endsWith(".doc")
@@ -388,10 +308,6 @@ if (!window._docPreviewClickAttached) {
 
                 const wrapper =
                     document.createElement("div");
-
-                // =====================================================
-                // LOADING
-                // =====================================================
                 const loading =
                     document.createElement("div");
 
@@ -404,9 +320,6 @@ if (!window._docPreviewClickAttached) {
                 loading.textContent =
                     "Generating preview...";
 
-                // =====================================================
-                // PDF CONTAINER
-                // =====================================================
                 const container =
                     document.createElement("div");
 
@@ -461,9 +374,6 @@ if (!window._docPreviewClickAttached) {
                 }
             }
 
-            // =====================================================
-            // PPTX / PPT
-            // =====================================================
             else if (
                 filename.endsWith(".pptx")
                 || filename.endsWith(".ppt")
@@ -476,9 +386,6 @@ if (!window._docPreviewClickAttached) {
                 const wrapper =
                     document.createElement("div");
 
-                // =====================================================
-                // LOADING
-                // =====================================================
                 const loading =
                     document.createElement("div");
 
@@ -491,9 +398,6 @@ if (!window._docPreviewClickAttached) {
                 loading.textContent =
                     "Generating preview...";
 
-                // =====================================================
-                // PDF CONTAINER
-                // =====================================================
                 const container =
                     document.createElement("div");
 
@@ -552,13 +456,8 @@ if (!window._docPreviewClickAttached) {
 }
 
 
-// =====================================================
-// CURSOR EFFECT
-// =====================================================
 if (!window._docPreviewHoverAttached) {
-
     window._docPreviewHoverAttached = true;
-
     document.addEventListener(
         "mouseover",
         function (ev) {
@@ -567,7 +466,6 @@ if (!window._docPreviewHoverAttached) {
                 ev.target.closest(
                     ".o-mail-AttachmentCard"
                 );
-
             if (!card) return;
 
             if (!card.dataset.cursorSet) {

@@ -10,9 +10,6 @@ import openpyxl
 
 class AttachmentPreviewController(http.Controller):
 
-    # =====================================================
-    # JSON RESPONSE
-    # =====================================================
     def _json_response(self, data, status=200):
 
         return request.make_response(
@@ -26,9 +23,7 @@ class AttachmentPreviewController(http.Controller):
             status=status
         )
 
-    # =====================================================
-    # PDF RESPONSE
-    # =====================================================
+
     def _pdf_response(self, pdf_data):
 
         return request.make_response(
@@ -43,9 +38,6 @@ class AttachmentPreviewController(http.Controller):
             ]
         )
 
-    # =====================================================
-    # PROCESSING RESPONSE
-    # =====================================================
     def _processing_response(self):
 
         return self._json_response({
@@ -57,9 +49,7 @@ class AttachmentPreviewController(http.Controller):
 
         }, status=202)
 
-    # =====================================================
-    # GET PREVIEW CACHE
-    # =====================================================
+
     def _get_preview_cache(self, attachment):
 
         cache_key = (
@@ -78,9 +68,6 @@ class AttachmentPreviewController(http.Controller):
 
         ], limit=1)
 
-    # =====================================================
-    # CSV / XLSX PREVIEW
-    # =====================================================
     @http.route(
         '/sheet/preview/<int:attachment_id>',
         auth='user',
@@ -115,9 +102,6 @@ class AttachmentPreviewController(http.Controller):
                 file_data
             )
 
-            # =====================================================
-            # XLSX / XLS / XLSM / XLSB
-            # =====================================================
             if (
                 filename.endswith(".xlsx")
                 or filename.endswith(".xlsm")
@@ -175,9 +159,6 @@ class AttachmentPreviewController(http.Controller):
                     "sheets": sheets_data
                 })
 
-            # =====================================================
-            # CSV
-            # =====================================================
             elif filename.endswith(".csv"):
 
                 file_content = file_data.decode(
@@ -228,9 +209,6 @@ class AttachmentPreviewController(http.Controller):
                     }]
                 })
 
-            # =====================================================
-            # UNSUPPORTED
-            # =====================================================
             return self._json_response({
 
                 "error":
@@ -244,9 +222,7 @@ class AttachmentPreviewController(http.Controller):
                 "error": str(e)
             })
 
-    # =====================================================
-    # DOCX PREVIEW
-    # =====================================================
+
     @http.route(
         '/docx/preview/<int:attachment_id>',
         auth='user',
@@ -262,23 +238,14 @@ class AttachmentPreviewController(http.Controller):
 
             return request.not_found()
 
-        # =====================================================
-        # CACHE
-        # =====================================================
         preview_cache = self._get_preview_cache(
             attachment
         )
 
-        # =====================================================
-        # STILL PROCESSING
-        # =====================================================
         if not preview_cache:
 
             return self._processing_response()
 
-        # =====================================================
-        # PDF DATA
-        # =====================================================
         pdf_data = base64.b64decode(
             preview_cache.datas
         )
@@ -287,9 +254,6 @@ class AttachmentPreviewController(http.Controller):
             pdf_data
         )
 
-    # =====================================================
-    # PPT PREVIEW
-    # =====================================================
     @http.route(
         '/ppt/preview/<int:attachment_id>',
         auth='user',
@@ -305,23 +269,14 @@ class AttachmentPreviewController(http.Controller):
 
             return request.not_found()
 
-        # =====================================================
-        # CACHE
-        # =====================================================
         preview_cache = self._get_preview_cache(
             attachment
         )
 
-        # =====================================================
-        # STILL PROCESSING
-        # =====================================================
         if not preview_cache:
 
             return self._processing_response()
 
-        # =====================================================
-        # PDF DATA
-        # =====================================================
         pdf_data = base64.b64decode(
             preview_cache.datas
         )
